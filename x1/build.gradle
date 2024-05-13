@@ -1,0 +1,38 @@
+plugins {
+	id 'java'
+	id 'org.springframework.boot' version '3.2.5'
+	id 'io.spring.dependency-management' version '1.1.4'
+}
+
+group = 'com.logging'
+version = '0.0.1-SNAPSHOT'
+
+java {
+	sourceCompatibility = '21'
+}
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'net.logstash.logback:logstash-logback-encoder:7.4'
+	implementation 'org.zalando:logbook-logstash:3.8.0'
+	implementation 'org.zalando:logbook-netty:3.8.0'
+	implementation 'org.zalando:logbook-spring-webflux:3.8.0'
+	implementation 'io.micrometer:micrometer-tracing-bridge-brave:1.2.5'
+	implementation 'org.projectlombok:lombok:1.18.28'
+	implementation 'org.jetbrains:annotations:24.0.0'
+	implementation 'io.micrometer:micrometer-registry-datadog:1.12.5'
+	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testImplementation 'io.projectreactor:reactor-test'
+
+}
+
+tasks.named('test') {
+	useJUnitPlatform()
+}

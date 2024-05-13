@@ -1,0 +1,10 @@
+<included>
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%boldWhite(%d{HH:mm:ss.SSS}) [%green(%X{traceId:--}) %yellow(%X{spanId:--})] [%blue(%X{dd.trace_id:--}) %white(%X{mdcUser:--}) %blue(%X{app-version:--})] %highlight(%.-1level) %clr(%-35.35logger{35}){cyan} %clr(:){faint} %m%n${LOG_EXCEPTION_CONVERSION_WORD:-%wEx}"/>
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+</included>

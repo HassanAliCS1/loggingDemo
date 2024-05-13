@@ -1,0 +1,13 @@
+<configuration>
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+    <include resource="logback-stdout-appender.xml"/>
+
+    <turboFilter class="com.filter.demo.logging.LoggingNoiseFilter"/>
+
+    <springProfile name="default">
+        <root level="INFO">
+            <appender-ref ref="STDOUT"/>
+        </root>
+    </springProfile>
+
+</configuration>

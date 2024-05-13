@@ -1,0 +1,29 @@
+spring:
+  application:
+    name:
+      demo
+
+management:
+  datadog:
+    metrics:
+      export:
+        api-key:
+        application-key:
+        enabled: false
+  tracing:
+    sampling:
+      probability: 1.0
+    baggage:
+      correlation:
+        fields:
+          - mdcUser
+          - app-version
+      remote-fields:
+        - app-version
+        - mdcUser
+
+logging:
+  level:
+    root: INFO
+    com.filter: TRACE
+    org.zalando.logbook.Logbook: TRACE
