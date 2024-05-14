@@ -24,30 +24,6 @@ public class TracingRespFilter implements WebFilter {
 
     Logger log = LoggerFactory.getLogger(TracingRespFilter.class);
 
-//    @Override
-//    public @NotNull Mono<Void> filter(ServerWebExchange exchange, WebFilterChain chain) {
-//        ServerHttpResponse response = exchange.getResponse();
-//        response.beforeCommit(() -> {
-//            Span span = exchange.getAttribute(Span.class.getName());
-//            if (span != null) {
-//
-//                exchange.getResponse().getHeaders().add(TRACE_ID_NAME, span.context().traceId());
-//                exchange.getResponse().getHeaders().add(SPAN_ID_NAME, span.context().spanId());
-//
-//                exchange.getResponse().getHeaders().add(DD_TRACE_NAME, span.context().traceId());
-//                exchange.getResponse().getHeaders().add(APP_VERSION,
-//                        Optional.ofNullable(exchange.getRequest().getHeaders().get(APP_VERSION))
-//                        .map(list -> list.get(0))
-//                        .orElse(Strings.EMPTY));
-//
-//                exchange.getResponse().getHeaders().add(MDC_USER_NAME, "This_is_user_id");
-//                span.end();
-//            }
-//            return Mono.empty();
-//        });
-//        return chain.filter(exchange);
-//    }
-
     @Override
     public @NotNull Mono<Void> filter(ServerWebExchange exchange, WebFilterChain webFilterChain) {
         Span span = exchange.getAttribute(Span.class.getName());
