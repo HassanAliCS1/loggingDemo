@@ -1,4 +1,4 @@
-package com.logging.x1.logging;
+package com.logging.x1.loggingFilters;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;

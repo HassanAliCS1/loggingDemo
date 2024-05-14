@@ -42,6 +42,7 @@ public class TracingConfig {
     private final ObservationRegistry observationRegistry;
     public static final String MDC_USER_NAME = "mdcUser";
     public static final String DD_TRACE_NAME = "dd.trace_id";
+    public static final String DD_SPAN_NAME = "dd.span_id";
     public static final String APP_VERSION = "app-version";
 
     public TracingConfig(Tracer tracer, ObservationRegistry observationRegistry) {
@@ -81,44 +82,49 @@ public class TracingConfig {
     }
 
     @Bean
-    public LogbookCreator.Builder logbook(CorrelationId correlationId, Sink sink) {
+    public Logbook logbookServer(CorrelationId correlationId, Sink sink) {
         return Logbook.builder()
                 .sink(sink)
-                .headerFilter(HeaderFilters.authorization())
-                .correlationId(correlationId);
+                .correlationId(correlationId)
+                .headerFilter(X -> {
+                    Optional.ofNullable(tracer.currentSpan())
+                            .ifPresent(span -> {
+                                MDC.put(DD_TRACE_NAME, span.context().traceId());
+                                MDC.put(DD_SPAN_NAME, span.context().spanId());
+                            });
+                    return X;
+                })
+                .bodyFilter((_, _) -> Strings.EMPTY)
+                .build();
     }
 
     @Bean
     public NettyServerCustomizer logbookNettyServerCustomizer(
             ContextSnapshotFactory contextSnapshotFactory,
-            LogbookCreator.Builder logbook
+            Logbook logbookServer
     ) {
-        System.out.println("logbookNettyServerCustomizer Hit");
         return server -> server.doOnConnection(connection -> connection.addHandlerLast(
                 new TracingChannelDuplexHandler(
-                        new LogbookServerHandler(
-                                logbook
-                                        .requestFilter(HttpRequest::withoutBody)
-                                        .responseFilter(HttpResponse::withoutBody)
-                                        .build()
-                        ),
+                        new LogbookServerHandler(logbookServer),
                         contextSnapshotFactory
                 )
         )).metrics(true, Function.identity());
     }
 
-    @Bean
-    @Order(Ordered.HIGHEST_PRECEDENCE)
-    public WebFilter datadogTraceIdRemapFilter(Tracer tracer) {
-        System.out.println("datadogTraceIdRemapFilter Hit");
-        return (exchange, chain) -> chain.filter(exchange)
-                .contextWrite(ctx -> {
-                    Optional.ofNullable(tracer.currentSpan())
-                            .ifPresent(span -> MDC.put(DD_TRACE_NAME, span.context().traceId()));
-
-                    return ctx;
-                }).doFinally(_ -> MDC.remove(DD_TRACE_NAME));
-    }
+//    @Bean
+//    @Order(Ordered.HIGHEST_PRECEDENCE)
+//    public WebFilter datadogTraceIdRemapFilter(Tracer tracer) {
+//        System.out.println("datadogTraceIdRemapFilter Hit");
+//        return (exchange, chain) -> chain.filter(exchange)
+//                .contextWrite(ctx -> {
+//                    Optional.ofNullable(tracer.currentSpan())
+//                            .ifPresent(span -> {
+//                                MDC.put(DD_TRACE_NAME, span.context().traceId());
+//                                MDC.put(DD_SPAN_NAME, span.context().spanId());
+//                            });
+//                    return ctx;
+//                }).doFinally(_ -> MDC.remove(DD_TRACE_NAME));
+//    }
 
     @Bean
     @Order(2)

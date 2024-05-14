@@ -9,9 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.web.reactive.function.client.WebClient;
-import org.zalando.logbook.HttpHeaders;
-import org.zalando.logbook.Logbook;
-import org.zalando.logbook.LogbookCreator;
+import org.zalando.logbook.*;
 import org.zalando.logbook.netty.LogbookClientHandler;
 import reactor.netty.http.client.HttpClient;
 
@@ -19,21 +17,28 @@ import java.time.Duration;
 
 import static org.springframework.http.HttpHeaders.ACCEPT;
 import static org.springframework.http.HttpHeaders.CONTENT_TYPE;
+import static org.zalando.logbook.json.JsonPathBodyFilters.jsonPath;
 
 @Configuration
 public class X1_WebClientConfig {
 
     @Bean
-    public WebClient arrayWebClient(
+    public Logbook logbookX1(CorrelationId correlationId, Sink sink) {
+        return Logbook.builder()
+                .sink(sink)
+                .correlationId(correlationId)
+                .headerFilter(_ -> HttpHeaders.empty())
+                .bodyFilter(jsonPath("$.appKey").replace("***"))
+                .bodyFilter(jsonPath("$.userToken").replace("***"))
+                .build();
+    }
+
+    @Bean
+    public WebClient X1WebClient(
             WebClient.Builder builder,
             ContextSnapshotFactory contextSnapshotFactory,
-            LogbookCreator.Builder logbookBuilder
+            Logbook logbookX1
     ) {
-        Logbook logbook = logbookBuilder
-                .headerFilter(_ -> HttpHeaders.empty())
-                .bodyFilter((_, _) -> Strings.EMPTY)
-                .build();
-
         HttpClient httpClient = HttpClient
                 .newConnection()
                 .option(ChannelOption.CONNECT_TIMEOUT_MILLIS, 10000)
@@ -41,7 +46,7 @@ public class X1_WebClientConfig {
                 .responseTimeout(Duration.ofSeconds(20))
                 .doOnConnected(connection -> connection.addHandlerLast(
                         new TracingConfig.TracingChannelDuplexHandler(
-                                new LogbookClientHandler(logbook),
+                                new LogbookClientHandler(logbookX1),
                                 contextSnapshotFactory
                         )
                 ));
