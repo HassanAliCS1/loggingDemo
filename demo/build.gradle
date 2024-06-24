@@ -32,6 +32,7 @@ dependencies {
 	implementation 'org.jetbrains:annotations:24.0.0'
 	implementation 'io.micrometer:micrometer-registry-datadog:1.12.5'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.17.0'
 
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'io.projectreactor:reactor-test'

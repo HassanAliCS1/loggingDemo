@@ -1,6 +1,5 @@
-package com.filter.demo.service;
+package com.filter.demo.x1.service;
 
-import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
 public interface X1Service {

@@ -1,9 +1,8 @@
-package com.filter.demo.controller;
+package com.filter.demo.x1.controller;
 
-import com.filter.demo.service.X1Service;
+import com.filter.demo.x1.service.X1Service;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Bean;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
